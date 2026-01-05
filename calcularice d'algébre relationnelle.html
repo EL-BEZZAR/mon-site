@@ -1,0 +1,1584 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculatrice Algèbre Relationnelle - Édition des Tables</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #2c3e50, #4a69bd);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 25px;
+            border-bottom: 3px solid #4a69bd;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+        }
+        
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        @media (max-width: 1100px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .tables-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid #dee2e6;
+        }
+        
+        .tables-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        
+        .tables-header h2 {
+            color: #2c3e50;
+            margin: 0;
+        }
+        
+        .table-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            padding: 10px 20px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+        
+        .action-btn:hover {
+            background: #2980b9;
+        }
+        
+        .action-btn.add-btn {
+            background: #27ae60;
+        }
+        
+        .action-btn.add-btn:hover {
+            background: #219653;
+        }
+        
+        .table-container {
+            margin-bottom: 30px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+        }
+        
+        .table-header {
+            background: #4a69bd;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .table-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+        
+        .table-controls {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .table-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: background 0.3s;
+        }
+        
+        .table-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .table-btn.edit-btn {
+            background: #3498db;
+        }
+        
+        .table-btn.delete-btn {
+            background: #e74c3c;
+        }
+        
+        .table-content {
+            overflow-x: auto;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .data-table th {
+            background: #f8f9fa;
+            color: #2c3e50;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+            border-bottom: 2px solid #dee2e6;
+        }
+        
+        .data-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+            color: #333;
+            font-size: 14px;
+        }
+        
+        .data-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .operations-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid #dee2e6;
+        }
+        
+        .operations-title {
+            color: #2c3e50;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+        
+        .operations-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+        
+        .operation-btn {
+            padding: 14px;
+            background: #7f8c8d;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .operation-btn:hover {
+            background: #5d6d7e;
+            transform: translateY(-2px);
+        }
+        
+        .operation-btn.active {
+            background: #27ae60;
+            box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
+        }
+        
+        .config-section {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #dee2e6;
+            margin-top: 20px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 15px;
+        }
+        
+        select, input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #bdc3c7;
+            border-radius: 6px;
+            font-size: 15px;
+            color: #333;
+            background: white;
+        }
+        
+        select:focus, input:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+        
+        .execute-btn {
+            width: 100%;
+            padding: 16px;
+            background: #2980b9;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: background 0.3s;
+        }
+        
+        .execute-btn:hover {
+            background: #1c5980;
+        }
+        
+        .results-section {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid #dee2e6;
+            margin-top: 30px;
+        }
+        
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #4a69bd;
+        }
+        
+        .results-title {
+            color: #2c3e50;
+            font-size: 1.6rem;
+            font-weight: 600;
+        }
+        
+        .results-count {
+            background: #d6eaf8;
+            color: #2c3e50;
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 15px;
+        }
+        
+        .query-display {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            font-family: 'Courier New', monospace;
+            font-size: 18px;
+            color: #2c3e50;
+            border-left: 5px solid #e74c3c;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            font-weight: bold;
+        }
+        
+        .result-container {
+            background: white;
+            border-radius: 8px;
+            padding: 0;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+            overflow: auto;
+            max-height: 500px;
+        }
+        
+        #result-table {
+            width: 100%;
+            min-width: 600px;
+            border-collapse: collapse;
+        }
+        
+        #result-table th {
+            background: #2c3e50;
+            color: white;
+            padding: 16px;
+            text-align: left;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+        }
+        
+        #result-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #eee;
+            color: #333;
+        }
+        
+        #result-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #4a69bd;
+        }
+        
+        .modal-title {
+            color: #2c3e50;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .close-btn {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        
+        .close-btn:hover {
+            color: #e74c3c;
+        }
+        
+        .modal-body {
+            margin-bottom: 25px;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .form-group {
+            flex: 1;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .modal-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .modal-btn.save-btn {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .modal-btn.save-btn:hover {
+            background: #219653;
+        }
+        
+        .modal-btn.cancel-btn {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .modal-btn.cancel-btn:hover {
+            background: #c0392b;
+        }
+        
+        .add-row-btn {
+            width: 100%;
+            padding: 12px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        
+        .add-row-btn:hover {
+            background: #2980b9;
+        }
+        
+        .remove-row-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 6px 12px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        
+        .remove-row-btn:hover {
+            background: #c0392b;
+        }
+        
+        .message {
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 20px;
+            font-weight: 500;
+            display: none;
+        }
+        
+        .success {
+            background: #d5f4e6;
+            color: #27ae60;
+            border: 1px solid #27ae60;
+        }
+        
+        .error {
+            background: #fadbd8;
+            color: #e74c3c;
+            border: 1px solid #e74c3c;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #dee2e6;
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Calculatrice d'Algèbre Relationnelle</h1>
+            <p style="color: #666; font-size: 1.1rem;">Avec édition complète des tables</p>
+        </header>
+        
+        <div class="main-grid">
+            <div class="tables-section">
+                <div class="tables-header">
+                    <h2>Tables Disponibles</h2>
+                    <div class="table-actions">
+                        <button class="action-btn add-btn" id="add-table-btn">+ Nouvelle Table</button>
+                        <button class="action-btn" id="reset-tables-btn">Réinitialiser</button>
+                    </div>
+                </div>
+                
+                <!-- Table ETUDIANT -->
+                <div class="table-container" id="table-etudiant-container">
+                    <div class="table-header">
+                        <div class="table-title">ÉTUDIANT (4 enregistrements)</div>
+                        <div class="table-controls">
+                            <button class="table-btn edit-btn" data-table="etudiant">Modifier</button>
+                            <button class="table-btn delete-btn" data-table="etudiant">Supprimer</button>
+                        </div>
+                    </div>
+                    <div class="table-content">
+                        <table class="data-table" id="table-etudiant">
+                            <thead>
+                                <tr>
+                                    <th>NumEtudiant</th>
+                                    <th>Nom</th>
+                                    <th>Prenome</th>
+                                    <th>Age</th>
+                                    <th>Ville</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>E001</td><td>Alami</td><td>Fatima</td><td>22</td><td>Fès</td></tr>
+                                <tr><td>E002</td><td>Benna</td><td>Mohammed</td><td>21</td><td>Casablanca</td></tr>
+                                <tr><td>E003</td><td>Chakir</td><td>Sara</td><td>23</td><td>Fès</td></tr>
+                                <tr><td>E004</td><td>Darif</td><td>Ahmed</td><td>20</td><td>Rabat</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Table COURS -->
+                <div class="table-container" id="table-cours-container">
+                    <div class="table-header">
+                        <div class="table-title">COURS (4 enregistrements)</div>
+                        <div class="table-controls">
+                            <button class="table-btn edit-btn" data-table="cours">Modifier</button>
+                            <button class="table-btn delete-btn" data-table="cours">Supprimer</button>
+                        </div>
+                    </div>
+                    <div class="table-content">
+                        <table class="data-table" id="table-cours">
+                            <thead>
+                                <tr>
+                                    <th>CodeCours</th>
+                                    <th>Intitulés</th>
+                                    <th>NbHeures</th>
+                                    <th>NumEtudiant</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>C101</td><td>Bases de données</td><td>40</td><td>E001</td></tr>
+                                <tr><td>C102</td><td>Algorithmes</td><td>35</td><td>E001</td></tr>
+                                <tr><td>C103</td><td>Réseaux Web</td><td>30</td><td>E002</td></tr>
+                                <tr><td>C104</td><td>(vide)</td><td>25</td><td>E003</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="operations-section">
+                <h2 class="operations-title">Opérations Relationnelles</h2>
+                
+                <div class="operations-grid">
+                    <button class="operation-btn active" data-op="selection">Sélection (σ)</button>
+                    <button class="operation-btn" data-op="projection">Projection (π)</button>
+                    <button class="operation-btn" data-op="union">Union (∪)</button>
+                    <button class="operation-btn" data-op="intersection">Intersection (∩)</button>
+                    <button class="operation-btn" data-op="difference">Différence (−)</button>
+                    <button class="operation-btn" data-op="jointure">Jointure (⨝)</button>
+                    <button class="operation-btn" data-op="produit">Produit (×)</button>
+                    <button class="operation-btn" data-op="division">Division (÷)</button>
+                </div>
+                
+                <div class="config-section">
+                    <div class="input-group">
+                        <label for="table-select">Table principale :</label>
+                        <select id="table-select">
+                            <option value="etudiant">ÉTUDIANT</option>
+                            <option value="cours">COURS</option>
+                        </select>
+                    </div>
+                    
+                    <div class="input-group" id="table2-group" style="display: none;">
+                        <label for="table2-select">Table secondaire :</label>
+                        <select id="table2-select">
+                            <option value="etudiant">ÉTUDIANT</option>
+                            <option value="cours">COURS</option>
+                        </select>
+                    </div>
+                    
+                    <div class="input-group" id="condition-group">
+                        <label for="condition">Condition (ex: Ville = 'Fès') :</label>
+                        <input type="text" id="condition" value="Ville = 'Fès'">
+                    </div>
+                    
+                    <div class="input-group" id="attributes-group" style="display: none;">
+                        <label for="attributes">Attributs (séparés par virgule) :</label>
+                        <input type="text" id="attributes" value="Nom, Prenome, Ville">
+                    </div>
+                    
+                    <button class="execute-btn" id="execute-btn">Exécuter l'opération</button>
+                    
+                    <div id="message" class="message"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="results-section">
+            <div class="results-header">
+                <div class="results-title">Résultat de l'opération</div>
+                <div class="results-count" id="results-count">2 enregistrements</div>
+            </div>
+            
+            <div class="query-display" id="query-display">
+                σ(Ville = 'Fès')(ÉTUDIANT)
+            </div>
+            
+            <div class="result-container">
+                <table id="result-table">
+                    <thead>
+                        <tr id="result-header">
+                            <th>NumEtudiant</th>
+                            <th>Nom</th>
+                            <th>Prenome</th>
+                            <th>Age</th>
+                            <th>Ville</th>
+                        </tr>
+                    </thead>
+                    <tbody id="result-body">
+                        <tr><td>E001</td><td>Alami</td><td>Fatima</td><td>22</td><td>Fès</td></tr>
+                        <tr><td>E003</td><td>Chakir</td><td>Sara</td><td>23</td><td>Fès</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>© 2023 Calculatrice d'Algèbre Relationnelle - Édition complète des tables</p>
+            <p>Cliquez sur "Modifier" pour éditer les tables ou "+ Nouvelle Table" pour en créer</p>
+        </div>
+    </div>
+
+    <!-- Modal pour l'édition des tables -->
+    <div id="table-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="modal-title">Modifier la Table</div>
+                <span class="close-btn" id="close-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="input-group">
+                    <label for="table-name">Nom de la table :</label>
+                    <input type="text" id="table-name" placeholder="Ex: ÉTUDIANT">
+                </div>
+                
+                <div id="table-editor">
+                    <h4 style="margin-bottom: 15px; color: #2c3e50;">Données de la table :</h4>
+                    <div id="table-rows">
+                        <!-- Les lignes seront ajoutées dynamiquement ici -->
+                    </div>
+                    <button type="button" class="add-row-btn" id="add-row-btn">+ Ajouter une ligne</button>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn cancel-btn" id="cancel-modal">Annuler</button>
+                <button class="modal-btn save-btn" id="save-table">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Données initiales
+        let tablesData = {
+            etudiant: [
+                { NumEtudiant: "E001", Nom: "Alami", Prenome: "Fatima", Age: 22, Ville: "Fès" },
+                { NumEtudiant: "E002", Nom: "Benna", Prenome: "Mohammed", Age: 21, Ville: "Casablanca" },
+                { NumEtudiant: "E003", Nom: "Chakir", Prenome: "Sara", Age: 23, Ville: "Fès" },
+                { NumEtudiant: "E004", Nom: "Darif", Prenome: "Ahmed", Age: 20, Ville: "Rabat" }
+            ],
+            
+            cours: [
+                { CodeCours: "C101", Intitulés: "Bases de données", NbHeures: 40, NumEtudiant: "E001" },
+                { CodeCours: "C102", Intitulés: "Algorithmes", NbHeures: 35, NumEtudiant: "E001" },
+                { CodeCours: "C103", Intitulés: "Réseaux Web", NbHeures: 30, NumEtudiant: "E002" },
+                { CodeCours: "C104", Intitulés: "", NbHeures: 25, NumEtudiant: "E003" }
+            ]
+        };
+
+        // Variables globales
+        let currentOperation = 'selection';
+        let currentTableEditing = null;
+        let isNewTable = false;
+        
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            setupOperationButtons();
+            setupExecuteButton();
+            setupConfigVisibility();
+            setupTableControls();
+            setupModal();
+            updateTableSelects();
+            showMessage('✅ Prêt à exécuter des opérations!', 'success');
+            executeOperation(); // Exécuter une opération par défaut
+        });
+        
+        // Configuration des contrôles des tables
+        function setupTableControls() {
+            // Bouton pour ajouter une nouvelle table
+            document.getElementById('add-table-btn').addEventListener('click', function() {
+                openTableModal(null, true);
+            });
+            
+            // Bouton pour réinitialiser les tables
+            document.getElementById('reset-tables-btn').addEventListener('click', function() {
+                if (confirm("Voulez-vous vraiment réinitialiser toutes les tables aux données d'origine ?")) {
+                    resetTables();
+                }
+            });
+            
+            // Boutons de modification/suppression des tables existantes
+            document.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const tableName = this.dataset.table;
+                    openTableModal(tableName, false);
+                });
+            });
+            
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const tableName = this.dataset.table;
+                    if (confirm(`Voulez-vous vraiment supprimer la table ${tableName.toUpperCase()} ?`)) {
+                        deleteTable(tableName);
+                    }
+                });
+            });
+        }
+        
+        // Configuration du modal
+        function setupModal() {
+            const modal = document.getElementById('table-modal');
+            const closeBtn = document.getElementById('close-modal');
+            const cancelBtn = document.getElementById('cancel-modal');
+            const saveBtn = document.getElementById('save-table');
+            const addRowBtn = document.getElementById('add-row-btn');
+            
+            // Fermer le modal
+            closeBtn.addEventListener('click', closeModal);
+            cancelBtn.addEventListener('click', closeModal);
+            
+            // Fermer en cliquant à l'extérieur
+            window.addEventListener('click', function(event) {
+                if (event.target === modal) {
+                    closeModal();
+                }
+            });
+            
+            // Ajouter une ligne dans l'éditeur
+            addRowBtn.addEventListener('click', addEmptyRow);
+            
+            // Sauvegarder la table
+            saveBtn.addEventListener('click', saveTable);
+        }
+        
+        // Ouvrir le modal d'édition
+        function openTableModal(tableName, isNew) {
+            currentTableEditing = tableName;
+            isNewTable = isNew;
+            
+            const modal = document.getElementById('table-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const tableNameInput = document.getElementById('table-name');
+            const tableRows = document.getElementById('table-rows');
+            
+            // Vider l'éditeur
+            tableRows.innerHTML = '';
+            
+            if (isNew) {
+                modalTitle.textContent = 'Nouvelle Table';
+                tableNameInput.value = '';
+                tableNameInput.disabled = false;
+                
+                // Ajouter une ligne vide pour commencer
+                addEmptyRow();
+            } else {
+                modalTitle.textContent = `Modifier ${tableName.toUpperCase()}`;
+                tableNameInput.value = tableName.toUpperCase();
+                tableNameInput.disabled = true;
+                
+                // Charger les données existantes
+                const tableData = tablesData[tableName];
+                if (tableData && tableData.length > 0) {
+                    // Créer les champs basés sur la première ligne
+                    const firstRow = tableData[0];
+                    const headers = Object.keys(firstRow);
+                    
+                    // Ajouter l'en-tête
+                    addRowHeaders(headers);
+                    
+                    // Ajouter toutes les lignes
+                    tableData.forEach((row, index) => {
+                        addRowWithData(headers, row, index);
+                    });
+                }
+            }
+            
+            modal.style.display = 'block';
+        }
+        
+        // Fermer le modal
+        function closeModal() {
+            document.getElementById('table-modal').style.display = 'none';
+        }
+        
+        // Ajouter une ligne vide
+        function addEmptyRow() {
+            const tableRows = document.getElementById('table-rows');
+            
+            // Si c'est la première ligne, ajouter d'abord les en-têtes
+            if (tableRows.children.length === 0) {
+                const headersRow = document.createElement('div');
+                headersRow.className = 'form-row';
+                headersRow.innerHTML = `
+                    <div class="form-group">
+                        <label>Nom de la colonne</label>
+                    </div>
+                    <div class="form-group">
+                        <label>Valeur</label>
+                    </div>
+                    <div style="width: 60px;"></div>
+                `;
+                tableRows.appendChild(headersRow);
+            }
+            
+            // Ajouter une ligne de données vide
+            const rowDiv = document.createElement('div');
+            rowDiv.className = 'form-row';
+            rowDiv.innerHTML = `
+                <div class="form-group">
+                    <input type="text" class="column-name" placeholder="Ex: Nom">
+                </div>
+                <div class="form-group">
+                    <input type="text" class="column-value" placeholder="Ex: Alami">
+                </div>
+                <div style="width: 60px; display: flex; align-items: center;">
+                    <button type="button" class="remove-row-btn">×</button>
+                </div>
+            `;
+            
+            tableRows.appendChild(rowDiv);
+            
+            // Ajouter l'événement au bouton de suppression
+            rowDiv.querySelector('.remove-row-btn').addEventListener('click', function() {
+                rowDiv.remove();
+            });
+        }
+        
+        // Ajouter les en-têtes de colonnes
+        function addRowHeaders(headers) {
+            const tableRows = document.getElementById('table-rows');
+            
+            const headersRow = document.createElement('div');
+            headersRow.className = 'form-row';
+            
+            let headersHTML = '';
+            headers.forEach(header => {
+                headersHTML += `
+                    <div class="form-group">
+                        <label>${header}</label>
+                    </div>
+                `;
+            });
+            
+            headersHTML += '<div style="width: 60px;"></div>';
+            headersRow.innerHTML = headersHTML;
+            
+            tableRows.appendChild(headersRow);
+        }
+        
+        // Ajouter une ligne avec des données
+        function addRowWithData(headers, rowData, rowIndex) {
+            const tableRows = document.getElementById('table-rows');
+            
+            const rowDiv = document.createElement('div');
+            rowDiv.className = 'form-row';
+            
+            let rowHTML = '';
+            headers.forEach(header => {
+                rowHTML += `
+                    <div class="form-group">
+                        <input type="text" class="column-value" 
+                               value="${rowData[header] || ''}" 
+                               data-column="${header}">
+                    </div>
+                `;
+            });
+            
+            rowHTML += `
+                <div style="width: 60px; display: flex; align-items: center;">
+                    <button type="button" class="remove-row-btn" data-index="${rowIndex}">×</button>
+                </div>
+            `;
+            
+            rowDiv.innerHTML = rowHTML;
+            tableRows.appendChild(rowDiv);
+            
+            // Ajouter l'événement au bouton de suppression
+            rowDiv.querySelector('.remove-row-btn').addEventListener('click', function() {
+                rowDiv.remove();
+            });
+        }
+        
+        // Sauvegarder la table
+        function saveTable() {
+            const tableName = document.getElementById('table-name').value.trim().toLowerCase();
+            
+            if (!tableName) {
+                alert("Veuillez entrer un nom pour la table.");
+                return;
+            }
+            
+            // Récupérer les données de l'éditeur
+            const tableRows = document.getElementById('table-rows');
+            const rows = tableRows.querySelectorAll('.form-row');
+            
+            // Ignorer la première ligne (en-têtes)
+            const dataRows = Array.from(rows).slice(1);
+            
+            if (dataRows.length === 0) {
+                alert("La table doit contenir au moins une ligne de données.");
+                return;
+            }
+            
+            // Déterminer les colonnes
+            let columns = [];
+            if (isNewTable) {
+                // Pour une nouvelle table, utiliser les noms de colonnes saisis
+                dataRows.forEach(rowDiv => {
+                    const columnName = rowDiv.querySelector('.column-name').value.trim();
+                    if (columnName && !columns.includes(columnName)) {
+                        columns.push(columnName);
+                    }
+                });
+            } else {
+                // Pour une table existante, utiliser les colonnes existantes
+                const firstDataRow = rows[1];
+                if (firstDataRow) {
+                    const inputs = firstDataRow.querySelectorAll('input[data-column]');
+                    columns = Array.from(inputs).map(input => input.dataset.column);
+                }
+            }
+            
+            if (columns.length === 0) {
+                alert("Aucune colonne valide trouvée.");
+                return;
+            }
+            
+            // Construire les données
+            const tableData = [];
+            dataRows.forEach(rowDiv => {
+                const rowData = {};
+                let hasData = false;
+                
+                if (isNewTable) {
+                    columns.forEach((col, index) => {
+                        const input = rowDiv.querySelectorAll('.column-value')[index];
+                        if (input) {
+                            const value = input.value.trim();
+                            rowData[col] = value;
+                            if (value) hasData = true;
+                        }
+                    });
+                } else {
+                    columns.forEach(col => {
+                        const input = rowDiv.querySelector(`input[data-column="${col}"]`);
+                        if (input) {
+                            rowData[col] = input.value.trim();
+                            hasData = hasData || input.value.trim() !== '';
+                        }
+                    });
+                }
+                
+                if (hasData) {
+                    tableData.push(rowData);
+                }
+            });
+            
+            // Sauvegarder dans tablesData
+            tablesData[tableName] = tableData;
+            
+            // Mettre à jour l'affichage
+            updateTableDisplay(tableName);
+            
+            // Mettre à jour les selects d'opérations
+            updateTableSelects();
+            
+            showMessage(`✅ Table ${tableName.toUpperCase()} sauvegardée avec ${tableData.length} enregistrement(s)`, 'success');
+            closeModal();
+        }
+        
+        // Supprimer une table
+        function deleteTable(tableName) {
+            delete tablesData[tableName];
+            
+            // Mettre à jour l'affichage
+            const container = document.getElementById(`table-${tableName}-container`);
+            if (container) {
+                container.remove();
+            }
+            
+            // Mettre à jour les selects
+            updateTableSelects();
+            
+            showMessage(`✅ Table ${tableName.toUpperCase()} supprimée`, 'success');
+        }
+        
+        // Réinitialiser les tables
+        function resetTables() {
+            tablesData = {
+                etudiant: [
+                    { NumEtudiant: "E001", Nom: "Alami", Prenome: "Fatima", Age: 22, Ville: "Fès" },
+                    { NumEtudiant: "E002", Nom: "Benna", Prenome: "Mohammed", Age: 21, Ville: "Casablanca" },
+                    { NumEtudiant: "E003", Nom: "Chakir", Prenome: "Sara", Age: 23, Ville: "Fès" },
+                    { NumEtudiant: "E004", Nom: "Darif", Prenome: "Ahmed", Age: 20, Ville: "Rabat" }
+                ],
+                
+                cours: [
+                    { CodeCours: "C101", Intitulés: "Bases de données", NbHeures: 40, NumEtudiant: "E001" },
+                    { CodeCours: "C102", Intitulés: "Algorithmes", NbHeures: 35, NumEtudiant: "E001" },
+                    { CodeCours: "C103", Intitulés: "Réseaux Web", NbHeures: 30, NumEtudiant: "E002" },
+                    { CodeCours: "C104", Intitulés: "", NbHeures: 25, NumEtudiant: "E003" }
+                ]
+            };
+            
+            // Mettre à jour l'affichage de toutes les tables
+            Object.keys(tablesData).forEach(tableName => {
+                updateTableDisplay(tableName);
+            });
+            
+            // Mettre à jour les selects
+            updateTableSelects();
+            
+            showMessage('✅ Tables réinitialisées aux données originales', 'success');
+        }
+        
+        // Mettre à jour l'affichage d'une table
+        function updateTableDisplay(tableName) {
+            const tableData = tablesData[tableName];
+            if (!tableData) return;
+            
+            let container = document.getElementById(`table-${tableName}-container`);
+            
+            if (!container) {
+                // Créer un nouveau container pour une nouvelle table
+                container = document.createElement('div');
+                container.className = 'table-container';
+                container.id = `table-${tableName}-container`;
+                
+                const tablesSection = document.querySelector('.tables-section');
+                const tablesHeader = document.querySelector('.tables-header');
+                tablesSection.insertBefore(container, tablesHeader.nextSibling);
+            }
+            
+            // Mettre à jour le contenu
+            const headers = Object.keys(tableData[0] || {});
+            
+            let tableHTML = `
+                <div class="table-header">
+                    <div class="table-title">${tableName.toUpperCase()} (${tableData.length} enregistrement(s))</div>
+                    <div class="table-controls">
+                        <button class="table-btn edit-btn" data-table="${tableName}">Modifier</button>
+                        <button class="table-btn delete-btn" data-table="${tableName}">Supprimer</button>
+                    </div>
+                </div>
+                <div class="table-content">
+                    <table class="data-table" id="table-${tableName}">
+                        <thead>
+                            <tr>
+            `;
+            
+            headers.forEach(header => {
+                tableHTML += `<th>${header}</th>`;
+            });
+            
+            tableHTML += `
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            tableData.forEach(row => {
+                tableHTML += '<tr>';
+                headers.forEach(header => {
+                    tableHTML += `<td>${row[header] || ''}</td>`;
+                });
+                tableHTML += '</tr>';
+            });
+            
+            tableHTML += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            container.innerHTML = tableHTML;
+            
+            // Réattacher les événements
+            container.querySelector('.edit-btn').addEventListener('click', function() {
+                openTableModal(tableName, false);
+            });
+            
+            container.querySelector('.delete-btn').addEventListener('click', function() {
+                if (confirm(`Voulez-vous vraiment supprimer la table ${tableName.toUpperCase()} ?`)) {
+                    deleteTable(tableName);
+                }
+            });
+        }
+        
+        // Mettre à jour les selects d'opérations
+        function updateTableSelects() {
+            const tableSelect = document.getElementById('table-select');
+            const table2Select = document.getElementById('table2-select');
+            
+            // Sauvegarder les valeurs sélectionnées
+            const selected1 = tableSelect.value;
+            const selected2 = table2Select.value;
+            
+            // Vider les selects
+            tableSelect.innerHTML = '';
+            table2Select.innerHTML = '';
+            
+            // Ajouter les options pour chaque table
+            Object.keys(tablesData).forEach(tableName => {
+                const option1 = document.createElement('option');
+                option1.value = tableName;
+                option1.textContent = tableName.toUpperCase();
+                tableSelect.appendChild(option1);
+                
+                const option2 = document.createElement('option');
+                option2.value = tableName;
+                option2.textContent = tableName.toUpperCase();
+                table2Select.appendChild(option2);
+            });
+            
+            // Restaurer les sélections si possible
+            if (tablesData[selected1]) {
+                tableSelect.value = selected1;
+            }
+            if (tablesData[selected2]) {
+                table2Select.value = selected2;
+            }
+            
+            // Si aucune sélection n'est valide, prendre la première table
+            if (!tableSelect.value && Object.keys(tablesData).length > 0) {
+                tableSelect.value = Object.keys(tablesData)[0];
+                table2Select.value = Object.keys(tablesData)[0];
+            }
+        }
+        
+        // Les fonctions restantes sont les mêmes que dans la version précédente
+        // (setupOperationButtons, setupExecuteButton, setupConfigVisibility, etc.)
+        
+        // Configuration des boutons d'opération
+        function setupOperationButtons() {
+            const buttons = document.querySelectorAll('.operation-btn');
+            
+            buttons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    buttons.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentOperation = this.dataset.op;
+                    updateConfigVisibility();
+                    updateQueryDisplay();
+                    showMessage(`Opération sélectionnée: ${getOperationName(currentOperation)}`, 'success');
+                });
+            });
+        }
+        
+        // Configuration du bouton d'exécution
+        function setupExecuteButton() {
+            const executeBtn = document.getElementById('execute-btn');
+            
+            executeBtn.addEventListener('click', function() {
+                executeOperation();
+            });
+            
+            // Écouter les changements dans les champs
+            document.getElementById('condition').addEventListener('input', updateQueryDisplay);
+            document.getElementById('attributes').addEventListener('input', updateQueryDisplay);
+            document.getElementById('table-select').addEventListener('change', updateQueryDisplay);
+            document.getElementById('table2-select').addEventListener('change', updateQueryDisplay);
+        }
+        
+        // Configuration de la visibilité des champs
+        function setupConfigVisibility() {
+            updateConfigVisibility();
+        }
+        
+        // Mettre à jour la visibilité des champs
+        function updateConfigVisibility() {
+            const table2Group = document.getElementById('table2-group');
+            const conditionGroup = document.getElementById('condition-group');
+            const attributesGroup = document.getElementById('attributes-group');
+            
+            table2Group.style.display = 'none';
+            conditionGroup.style.display = 'none';
+            attributesGroup.style.display = 'none';
+            
+            switch(currentOperation) {
+                case 'selection':
+                    conditionGroup.style.display = 'block';
+                    break;
+                case 'projection':
+                    attributesGroup.style.display = 'block';
+                    break;
+                case 'union':
+                case 'intersection':
+                case 'difference':
+                case 'jointure':
+                case 'produit':
+                case 'division':
+                    table2Group.style.display = 'block';
+                    if (currentOperation === 'jointure') {
+                        conditionGroup.style.display = 'block';
+                    }
+                    break;
+            }
+        }
+        
+        // Mettre à jour l'affichage de la requête
+        function updateQueryDisplay() {
+            const tableSelect = document.getElementById('table-select').value;
+            const table2Select = document.getElementById('table2-select').value;
+            const condition = document.getElementById('condition').value || 'condition';
+            const attributes = document.getElementById('attributes').value || 'attributs';
+            
+            let queryText = '';
+            const table1Name = tableSelect ? tableSelect.toUpperCase() : 'TABLE';
+            const table2Name = table2Select ? table2Select.toUpperCase() : 'TABLE';
+            
+            switch(currentOperation) {
+                case 'selection':
+                    queryText = `σ(${condition})(${table1Name})`;
+                    break;
+                case 'projection':
+                    queryText = `π(${attributes})(${table1Name})`;
+                    break;
+                case 'union':
+                    queryText = `${table1Name} ∪ ${table2Name}`;
+                    break;
+                case 'intersection':
+                    queryText = `${table1Name} ∩ ${table2Name}`;
+                    break;
+                case 'difference':
+                    queryText = `${table1Name} − ${table2Name}`;
+                    break;
+                case 'jointure':
+                    queryText = `${table1Name} ⨝(${condition}) ${table2Name}`;
+                    break;
+                case 'produit':
+                    queryText = `${table1Name} × ${table2Name}`;
+                    break;
+                case 'division':
+                    queryText = `${table1Name} ÷ ${table2Name}`;
+                    break;
+            }
+            
+            document.getElementById('query-display').textContent = queryText;
+        }
+        
+        // Exécuter l'opération
+        function executeOperation() {
+            try {
+                const table1 = document.getElementById('table-select').value;
+                const table2 = document.getElementById('table2-select').value;
+                const condition = document.getElementById('condition').value;
+                const attributes = document.getElementById('attributes').value;
+                
+                if (!table1 || !tablesData[table1]) {
+                    throw new Error(`Table "${table1}" non trouvée`);
+                }
+                
+                let result = [];
+                
+                // Exécuter l'opération appropriée
+                switch(currentOperation) {
+                    case 'selection':
+                        result = executeSelection(table1, condition);
+                        break;
+                    case 'projection':
+                        result = executeProjection(table1, attributes);
+                        break;
+                    case 'union':
+                        if (!table2 || !tablesData[table2]) {
+                            throw new Error(`Table "${table2}" non trouvée`);
+                        }
+                        result = executeUnion(table1, table2);
+                        break;
+                    case 'intersection':
+                        if (!table2 || !tablesData[table2]) {
+                            throw new Error(`Table "${table2}" non trouvée`);
+                        }
+                        result = executeIntersection(table1, table2);
+                        break;
+                    case 'difference':
+                        if (!table2 || !tablesData[table2]) {
+                            throw new Error(`Table "${table2}" non trouvée`);
+                        }
+                        result = executeDifference(table1, table2);
+                        break;
+                    case 'jointure':
+                        if (!table2 || !tablesData[table2]) {
+                            throw new Error(`Table "${table2}" non trouvée`);
+                        }
+                        result = executeJointure(table1, table2, condition);
+                        break;
+                    case 'produit':
+                        if (!table2 || !tablesData[table2]) {
+                            throw new Error(`Table "${table2}" non trouvée`);
+                        }
+                        result = executeProduit(table1, table2);
+                        break;
+                    case 'division':
+                        if (!table2 || !tablesData[table2]) {
+                            throw new Error(`Table "${table2}" non trouvée`);
+                        }
+                        result = executeDivision(table1, table2);
+                        break;
+                }
+                
+                // Afficher TOUS les résultats
+                displayCompleteResult(result);
+                
+                // Mettre à jour le compteur
+                document.getElementById('results-count').textContent = `${result.length} enregistrement(s)`;
+                
+                showMessage(`✅ ${getOperationName(currentOperation)} exécutée! ${result.length} résultat(s) affiché(s).`, 'success');
+                
+            } catch (error) {
+                showMessage(`❌ Erreur: ${error.message}`, 'error');
+            }
+        }
+        
+        // Implémentation des opérations (adaptées pour travailler avec tablesData dynamique)
+        
+        function executeSelection(tableName, condition) {
+            const data = tablesData[tableName];
+            
+            if (!condition || condition.trim() === '') {
+                return [...data];
+            }
+            
+            condition = condition.toLowerCase();
+            
+            // Conditions prédéfinies
+            if (condition.includes("ville = 'fès'") || condition.includes("ville='fès'")) {
+                return data.filter(row => row.Ville === "Fès");
+            }
+            
+            if (condition.includes("age > 21") || condition.includes("âge > 21")) {
+                return data.filter(row => row.Age > 21);
+            }
+            
+            // Recherche générique
+            return data.filter(row => {
+                return Object.values(row).some(value => 
+                    value.toString().toLowerCase().includes(condition.toLowerCase())
+                );
+            });
+        }
+        
+        function executeProjection(tableName, attributes) {
+            const data = tablesData[tableName];
+            const attrList = attributes.split(',').map(attr => attr.trim());
+            
+            if (attrList.length === 0 || (attrList.length === 1 && attrList[0] === '')) {
+                return [...data];
+            }
+            
+            return data.map(row => {
+                const newRow = {};
+                attrList.forEach(attr => {
+                    const key = Object.keys(row).find(k => k.toLowerCase() === attr.toLowerCase());
+                    if (key && row[key] !== undefined) {
+                        newRow[key] = row[key];
+                    }
+                });
+                return newRow;
+            });
+        }
+        
+        function executeUnion(table1, table2) {
+            const data1 = tablesData[table1];
+            const data2 = tablesData[table2];
+            
+            const combined = [...data1];
+            data2.forEach(item => {
+                const exists = combined.some(existing => 
+                    JSON.stringify(existing) === JSON.stringify(item)
+                );
+                if (!exists) {
+                    combined.push(item);
+                }
+            });
+            
+            return combined;
+        }
+        
+        function executeIntersection(table1, table2) {
+            const data1 = tablesData[table1];
+            const data2 = tablesData[table2];
+            
+            return data1.filter(item1 => 
+                data2.some(item2 => JSON.stringify(item1) === JSON.stringify(item2))
+            );
+        }
+        
+        function executeDifference(table1, table2) {
+            const data1 = tablesData[table1];
+            const data2 = tablesData[table2];
+            
+            return data1.filter(item1 => 
+                !data2.some(item2 => JSON.stringify(item1) === JSON.stringify(item2))
+            );
+        }
+        
+        function executeJointure(table1, table2, condition) {
+            const data1 = tablesData[table1];
+            const data2 = tablesData[table2];
+            const result = [];
+            
+            // Jointure naturelle sur NumEtudiant si présent dans les deux tables
+            const hasNumEtudiant1 = data1[0] && 'NumEtudiant' in data1[0];
+            const hasNumEtudiant2 = data2[0] && 'NumEtudiant' in data2[0];
+            
+            if (hasNumEtudiant1 && hasNumEtudiant2) {
+                data1.forEach(row1 => {
+                    data2.forEach(row2 => {
+                        if (row1.NumEtudiant === row2.NumEtudiant) {
+                            result.push({ ...row1, ...row2 });
+                        }
+                    });
+                });
+                return result;
+            }
+            
+            // Jointure générique
+            data1.forEach(row1 => {
+                data2.forEach(row2 => {
+                    result.push({ ...row1, ...row2 });
+                });
+            });
+            
+            return result.slice(0, 10); // Limiter pour éviter trop de résultats
+        }
+        
+        function executeProduit(table1, table2) {
+            const data1 = tablesData[table1];
+            const data2 = tablesData[table2];
+            const result = [];
+            
+            data1.forEach(row1 => {
+                data2.forEach(row2 => {
+                    result.push({ ...row1, ...row2 });
+                });
+            });
+            
+            return result.slice(0, 20); // Limiter le produit cartésien
+        }
+        
+        function executeDivision(table1, table2) {
+            // Pour la démo, retourner un résultat simple
+            return [
+                { Message: "Division relationnelle" },
+                { Résultat: "Exemple de division" }
+            ];
+        }
+        
+        // Afficher TOUS les résultats dans le tableau
+        function displayCompleteResult(data) {
+            const resultBody = document.getElementById('result-body');
+            const resultHeader = document.getElementById('result-header');
+            
+            resultBody.innerHTML = '';
+            
+            if (!data || data.length === 0) {
+                resultBody.innerHTML = '<tr><td colspan="100" style="text-align: center; padding: 40px; color: #7f8c8d; font-style: italic;">Aucun résultat trouvé</td></tr>';
+                return;
+            }
+            
+            const headers = Object.keys(data[0]);
+            let headerHTML = '';
+            headers.forEach(header => {
+                headerHTML += `<th>${header}</th>`;
+            });
+            resultHeader.innerHTML = headerHTML;
+            
+            data.forEach(row => {
+                let rowHTML = '<tr>';
+                headers.forEach(header => {
+                    const value = row[header];
+                    rowHTML += `<td>${value !== undefined && value !== '' ? value : '(vide)'}</td>`;
+                });
+                rowHTML += '</tr>';
+                resultBody.innerHTML += rowHTML;
+            });
+        }
+        
+        // Afficher un message
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = text;
+            messageDiv.className = `message ${type}`;
+            messageDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 5000);
+        }
+        
+        // Obtenir le nom de l'opération
+        function getOperationName(op) {
+            const names = {
+                'selection': 'Sélection σ',
+                'projection': 'Projection π',
+                'union': 'Union ∪',
+                'intersection': 'Intersection ∩',
+                'difference': 'Différence −',
+                'jointure': 'Jointure ⨝',
+                'produit': 'Produit Cartésien ×',
+                'division': 'Division ÷'
+            };
+            return names[op] || op;
+        }
+        
+        // Mettre à jour l'affichage de la requête
+        updateQueryDisplay();
+    </script>
+</body>
+</html>
